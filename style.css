@@ -1,0 +1,31 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #272727;
+}
+.shell {
+    /* background-color: salmon; */
+    border: 2px solid #5d5d5d;
+    border-top-left-radius: 35px;
+    border-top-right-radius: 35px;
+    height: 700px;
+    width: 400px;
+    margin: auto;
+    margin-top: 10vh;
+    display: flex;
+    flex-direction: column;
+}
+.print-out {
+    /* flex: 1; */
+    height: 45%;
+    width: 100%;
+    /* background-color: salmon; */
+}
+.num-pad {
+    /* flex: 1; */
+    height: 55%;
+    width: 100%;
+    border-top-left-radius: 35px;
+    border-top-right-radius: 35px;
+    background-color: lightblue;
+}
