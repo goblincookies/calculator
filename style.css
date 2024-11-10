@@ -1,6 +1,17 @@
-body {
+* {
     margin: 0;
     padding: 0;
+    font-family: "Work Sans", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 800;
+    font-style: italic;
+    box-sizing: border-box;
+  
+
+}
+body {
+    /* margin: 0;
+    padding: 0; */
     background-color: #272727;
 }
 .shell {
@@ -22,10 +33,56 @@ body {
     /* background-color: salmon; */
 }
 .num-pad {
+    outline: 2px solid green;
     /* flex: 1; */
     height: 55%;
     width: 100%;
     border-top-left-radius: 35px;
     border-top-right-radius: 35px;
-    background-color: lightblue;
+    background-color: #5d5d5d;
+    padding: 8%;
+
+}
+
+.keys {
+    height: 100%;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+    gap: 25px;
+    /* grid-auto-rows: repeat(5, 1fr); */
+}
+
+.key {
+    overflow: hidden;
+}
+
+.key:nth-child(17) {
+    grid-column: -4;
+}
+
+.dark {
+    background-color: #272727;
+    color: #fff;
+}
+.light {
+    background-color: #5d5d5d;
+    color: #A2FFAA;
+}
+.accent {
+    background-color: #A2FFAA;
+    color: #272727;
+}
+
+button {
+    border: none;
+    display:inline-block;
+    /* width: 100%; */
+    /* height: 100%; */
+    font-size: 23px;
+    /* background-color: red; */
+} 
+
+button:hover {
+    background-color: purple;
 }
