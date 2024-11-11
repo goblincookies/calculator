@@ -101,7 +101,13 @@ body {
     background-color: #A2FFAA;
     color: #272727;
 }
-
+#cursor {
+    position: absolute;
+    /* background-color: red; */
+    -webkit-transform: translateX(-2px);
+    -ms-transform: translateX(-2px);
+    transform: translateX(-2px);
+}
 button {
     border: none;
     display:inline-block;
