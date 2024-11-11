@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <script src="calc.js" defer></script>
     <title>Calculator</title>
 </head>
 <body>
@@ -20,31 +21,31 @@
             <div class="line right print-display"></div>
             <div class="line input" id="input-b"></div>
             <div class="line input" id="input-a">
-                <span class="user-input green">58</span>
+                <span class="user-input green" id="user-input"></span>
                 <span class="yellow" id="selector">_</span>
             </div>
         </div>
         <div class="num-pad non">
             <div class="keys">
-                <button class="key dark">c</button>
-                <button class="key dark">$</button>
-                <button class="key dark">%</button>
-                <button class="key dark">/</button>
-                <button class="key light">7</button>
-                <button class="key light">8</button>
-                <button class="key light">9</button>
-                <button class="key dark">x</button>
-                <button class="key light">4</button>
-                <button class="key light">5</button>
-                <button class="key light">6</button>
-                <button class="key dark">-</button>
-                <button class="key light">1</button>
-                <button class="key light">2</button>
-                <button class="key light">3</button>
-                <button class="key dark">+</button>
-                <button class="key light">0</button>
-                <button class="key light">.</button>
-                <button class="key accent">=</button>
+                <button class="key dark" id="clear">c</button>
+                <button class="key dark" id="del">$</button>
+                <button class="key dark" id="perc">%</button>
+                <button class="key dark" id="divide">/</button>
+                <button class="key light" id="7">7</button>
+                <button class="key light" id="8">8</button>
+                <button class="key light" id="9">9</button>
+                <button class="key dark" id="mult">x</button>
+                <button class="key light" id="4">4</button>
+                <button class="key light" id="5">5</button>
+                <button class="key light" id="6">6</button>
+                <button class="key dark" id="minus">-</button>
+                <button class="key light" id="1">1</button>
+                <button class="key light" id="2">2</button>
+                <button class="key light" id="3">3</button>
+                <button class="key dark" id="add">+</button>
+                <button class="key light" id="zero">0</button>
+                <button class="key light" id="point">.</button>
+                <button class="key accent" id="calc">=</button>
 
             </div>
         </div>
