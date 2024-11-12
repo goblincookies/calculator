@@ -1,9 +1,10 @@
 let keys = document.querySelectorAll(".key");
 let typeBox = document.querySelector("#user-input");
-let inputA = document.querySelector("#input-a");
-let inputB = document.querySelector("#input-b");
-let printLines = document.querySelector("#print-out").querySelectorAll("div");
-
+let lineA = document.querySelector("#input-a");
+let lineB = document.querySelector("#input-b");
+let typeBoxB = lineB.querySelector(".print-display");
+let printLines = document.querySelector("#print-out").querySelectorAll(".line");
+let prevAnswer = "";
 let userInput = "";
 
 let cursorVisible = true;
@@ -27,15 +28,32 @@ function cursorVisibility( val ) {
     cursorVisible = val;
 }
 
+function clearAnim() {
+    printLines.forEach(el => {
+        // el.classList.remove("shift-anim");
+        el.querySelector(".print-display").classList.remove("shift-anim");
+
+    });
+}
+function playShiftAnim() {
+    console.log("playing anim..")
+
+    printLines.forEach(el => {
+        el.querySelector(".print-display").classList.add("shift-anim");
+    });
+}
+
 function keyPress(e) {
 
     if (displayingAnswer) {
-        shiftUp()
-        inputB.textContent="";
+        shiftUp();
+        clearAnim();
+        prevAnswer = typeBox.textContent;
+        typeBoxB.textContent="";
         typeBox.classList.remove("yellow");
         typeBox.classList.add("green");
         displayingAnswer = false;
-        inputA.classList.remove("right");
+        lineA.classList.remove("right");
         userInputClear();
     }
     console.log( e.target.id );
@@ -110,7 +128,7 @@ function addKeyPress( val ) {
         if (userInput[userInput.length-1] == "%" ) {
 
         } else {
-            userInputAdd(val);     
+            userlineAdd(val);     
         }
     } else {
         // IT'S A SYMOBL
@@ -119,11 +137,15 @@ function addKeyPress( val ) {
             case "%":
                 if (userInput.length<1) {
                     // PULL PREVIOUS NUMBER 
+                    if (prevAnswer.length >0) {
+                        // userInput = prevAnswer + val;
+                        userlineAdd(prevAnswer + val);
+                    }
                 } else {
                     let n = userInput[userInput.length-1];
                     console.log(typeof n);
                     if ( n== "%" | n=="." | parseInt(n).toString()==n ) {
-                        userInputAdd(val);
+                        userlineAdd(val);
                     }
                 };
                 break;
@@ -134,9 +156,9 @@ function addKeyPress( val ) {
                     let n = currentInput.filter(i=>i==".");
                     
                     if (n.length <1) {
-                        userInputAdd(val);
+                        userlineAdd(val);
                     } else if (n.length < 2 & currentInput.length > 1) {
-                        userInputAdd(val);
+                        userlineAdd(val);
                     }
                 }
                 break;
@@ -146,17 +168,20 @@ function addKeyPress( val ) {
             case "*":
             case "/":
                 if (userInput.length<1) {
-                    // PULL PREVIOUS NUMBER 
+                    // PULL PREVIOUS NUMBER
+                    if (prevAnswer.length >0) {
+                        // userInput = prevAnswer + val;
+                        userlineAdd(prevAnswer + val);
+                    }
                 } else {
                     let n = userInput.split(/[0-9%.]/).filter(i => i);
                     if ( ["-","+","*","/"].some( el => userInput[userInput.length-1].includes(el) ) ) {
                         deleteCharacter();
-                        userInputAdd(val);
+                        userlineAdd(val);
                     } else if (n.length < 1) {
-                        userInputAdd(val);
+                        userlineAdd(val);
                     }
                 }
-
                 break;
         }
 
@@ -168,7 +193,7 @@ function userInputClear() {
     typeBox.textContent = userInput;
 }
 
-function userInputAdd( val) {
+function userlineAdd( val) {
     userInput += val;
     typeBox.textContent = userInput;
 }
@@ -192,21 +217,28 @@ function clearScreen() {
 }
 
 function shiftUp() {
+    let printDisplayA
+    let printDisplayB
+
     for (let i= 0; i < printLines.length-2; i++) {
-        if (printLines[i+2].childElementCount > 0 ) {
+        console.log(i);
+        printDisplayA = printLines[i].querySelector(".print-display");
+        printDisplayB = printLines[i+2].querySelector(".print-display");
+
+        if (printDisplayB.childElementCount > 0 ) {
             // SKIP THE CURSOR
-            printLines[i].textContent = printLines[i+2].children[0].textContent
+            printDisplayA.textContent = printDisplayB.children[0].textContent;
         } else {
             // SIMPLE COPY UP
-            printLines[i].textContent = printLines[i+2].textContent
+            printDisplayA.textContent = printDisplayB.textContent
         }
+        printLines[i].classList.add("shift-anim");
     }
 }
 
 function manageFloat( val ) {
     val = parseFloat(val);
     let ans = ( val ).toFixed(12).toString();
-
 	return parseFloat(val);
 }
 
@@ -235,8 +267,9 @@ function processInput( digit ) {
     number = parseFloat(number);
 
     perc.forEach( () => {
-        number = (number/=100).toFixed(12).toString()
-        parseFloat( number );
+        number = manageFloat(number/=100);
+        // number = (number/=100).toFixed(12).toString()
+        // parseFloat( number );
         // console.log( "number is " + number );
     }  );
     // parseFloat(number.toFixed(8).toString())
@@ -246,11 +279,14 @@ function processInput( digit ) {
 function calcSolution() {
     displayingAnswer = true;
     cursorVisibility(false);
-    inputB.textContent = userInput;
+    typeBoxB.textContent = userInput;
+
     typeBox.classList.remove("green");
     typeBox.classList.add("yellow");
-    inputA.classList.add("right");
-    let numbers = userInput.split(/[/*-+]/); //.filter(i=>i);
+    lineA.classList.add("right");
+    lineB.classList.add("shift");
+
+    let numbers = userInput.split(/[/*-+]/).filter(i=>i);
     let operations = userInput.split(/[0-9.%]/).filter(i => i);
     console.log("my recorded input is: ", userInput);
     console.log("the numbers are ", numbers);
@@ -260,8 +296,12 @@ function calcSolution() {
     // EVALUATE OPPERATION
     // THERE ARE NO OPPERATIONS
     if (operations.length < 1 ) {
+        console.log("no opperations i guess");
         answer = processInput(userInput);
     } else {
+        if (numbers.length < 2) {
+            numbers.push("0");
+        }
         switch (operations[0]) {
             case "+":
                 answer = add( numbers[0], numbers[1] );
@@ -279,5 +319,6 @@ function calcSolution() {
     }
 
     typeBox.textContent = answer;
+    playShiftAnim();
 }
 

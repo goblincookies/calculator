@@ -35,19 +35,29 @@ body {
     flex-direction: column;
     /* background-color: salmon; */
 }
+
 .line {
-    font-size: 20px;
+    position: relative;
     flex: 1;
-    color: #9e9e9e;
-    outline: 2px solid green;
-}
-.line.right {
-    text-align: end;
+    font-size: 20px;
+    /* outline: 2px solid green; */
 }
 .input {
+    /* outline: 2px solid green; */
     flex-grow: 1.2;
     font-size: 35px;
 }
+.line.right {
+    /* color: purple; */
+    text-align: right;
+}
+.print-display {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    /* background-color: red; */
+}
+
 .input.left {
     color: #A2FFAA;
 }
@@ -132,5 +142,25 @@ button:active {
     -moz-user-select: none;
     -webkit-user-select: none;
     -ms-user-select: none;
-  }
-  
+}
+
+.shift-anim {
+    animation: shift .5s ease-out 1 forwards;
+}
+
+@keyframes shift {
+    0% {
+        /* background-color: yellow; */
+        -webkit-transform: translateY(10px);
+        -ms-transform: translateY(10px);
+        transform: translateY(10px);
+    }
+    100% {
+        /* background-color: black; */
+        -webkit-transform: translateY(0px);
+        -ms-transform: translateY(0px);
+        transform: translateY(0px);
+    }
+    /* background-color: red;  */
+
+}
