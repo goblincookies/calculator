@@ -106,7 +106,12 @@ function addKeyPress( val ) {
 
      // IT'S A NUMBER
      if (parseInt(val).toString() == val ) {
-        userInputAdd(val);
+        // PREVIOUS IS NOT A PERCENT?
+        if (userInput[userInput.length-1] == "%" ) {
+
+        } else {
+            userInputAdd(val);     
+        }
     } else {
         // IT'S A SYMOBL
         let currentInput = userInput.split(/[0-9]/).filter(i => i);
@@ -156,29 +161,6 @@ function addKeyPress( val ) {
         }
 
     }
-
-    // // CHECK IF PREV IS THE SAME
-    // console.log( "prev is: " + userInput[userInput.length-1])
-    // console.log( "this is: " + val )
-
-    // if (userInput[userInput.length-1] != val ) {
-
-    //     // CHECK PREV IS NOT A SYMBOL
-    //     if ( !isNaN( parseInt(userInput[userInput.length-1]))) {
-
-    //         return val;
-    //     } else {
-    //         deleteCharacter();
-    //         return val;
-
-    //     }
-    // }
-
-
-
-    // // val = parseVal( val);
-
-    // userInputAdd(val);
 }
 
 function userInputClear() {
@@ -221,6 +203,46 @@ function shiftUp() {
     }
 }
 
+function manageFloat( val ) {
+    val = parseFloat(val);
+    let ans = ( val ).toFixed(12).toString();
+
+	return parseFloat(val);
+}
+
+function add (a,b) {
+    console.log("adding")
+    return manageFloat(processInput(a)+processInput(b));
+};
+function subtract (a,b) {
+    return manageFloat(processInput(a)-processInput(b));
+};
+function multiply(a,b) {
+    return manageFloat(processInput(a)*processInput(b));
+};
+function divide(a,b) {
+    return manageFloat(processInput(a)/processInput(b));
+}
+
+function processInput( digit ) {
+
+    // GET PERCENTS
+    let perc = digit.split(/[0-9.]/).filter(i => i);
+    if (perc.length > 0) {
+        perc = perc[0].split("");
+    }
+    let number = digit.split(/[%]/).filter(i => i)[0];
+    number = parseFloat(number);
+
+    perc.forEach( () => {
+        number = (number/=100).toFixed(12).toString()
+        parseFloat( number );
+        // console.log( "number is " + number );
+    }  );
+    // parseFloat(number.toFixed(8).toString())
+    return parseFloat(number);
+}
+
 function calcSolution() {
     displayingAnswer = true;
     cursorVisibility(false);
@@ -228,11 +250,34 @@ function calcSolution() {
     typeBox.classList.remove("green");
     typeBox.classList.add("yellow");
     inputA.classList.add("right");
-    typeBox.textContent = "hello!";
     let numbers = userInput.split(/[/*-+]/); //.filter(i=>i);
     let operations = userInput.split(/[0-9.%]/).filter(i => i);
     console.log("my recorded input is: ", userInput);
     console.log("the numbers are ", numbers);
     console.log("the operations are " + operations);
+    let answer = "";
+
+    // EVALUATE OPPERATION
+    // THERE ARE NO OPPERATIONS
+    if (operations.length < 1 ) {
+        answer = processInput(userInput);
+    } else {
+        switch (operations[0]) {
+            case "+":
+                answer = add( numbers[0], numbers[1] );
+                break;
+            case "-":
+                answer = subtract( numbers[0], numbers[1] );
+                break;
+            case "/":
+                answer = divide( numbers[0], numbers[1] );
+                break;
+            case "*":
+                answer = multiply( numbers[0], numbers[1] );
+                break;
+        }
+    }
+
+    typeBox.textContent = answer;
 }
 
