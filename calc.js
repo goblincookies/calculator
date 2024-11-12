@@ -136,7 +136,7 @@ function addKeyPress( val ) {
                 }
                 break;
                 // break;
-            case "-":
+            case "-": //ACCOUNT FOR NEGATIVES
             case "+":
             case "*":
             case "/":
@@ -229,10 +229,10 @@ function calcSolution() {
     typeBox.classList.add("yellow");
     inputA.classList.add("right");
     typeBox.textContent = "hello!";
-    let numbers = userInput.split(/[/*-+%]/).filter(i=>i);
-    let operations = userInput.split(/[0-9]/).filter(i => i);
-
-    console.log("the numbers are " + numbers);
+    let numbers = userInput.split(/[/*-+]/); //.filter(i=>i);
+    let operations = userInput.split(/[0-9.%]/).filter(i => i);
+    console.log("my recorded input is: ", userInput);
+    console.log("the numbers are ", numbers);
     console.log("the operations are " + operations);
 }
 
