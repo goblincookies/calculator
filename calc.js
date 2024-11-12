@@ -26,18 +26,6 @@ function cursorVisibility( val ) {
     cursor.style.opacity = val+0;
     cursorVisible = val;
 }
-function userInputClear() {
-    userInput = "";
-    typeBox.textContent = userInput;
-}
-function userInputAdd( val) {
-    userInput += val;
-    typeBox.textContent = userInput;
-}
-function userInputDelete() {
-    userInput = userInput.slice(0, -1);
-    typeBox.textContent = userInput;
-}
 
 function keyPress(e) {
 
@@ -70,19 +58,22 @@ function keyPress(e) {
 
     if (isNumber) {
         cursorVisibility(false);
-        addCharacter( e.target.id);
+        addKeyPress( e.target.id);
     }
+
 };
 
+function makeHighlighSpan() {
+    let span = document.createElement("span");
+    span.classList.add("yellow");
+    return span;
+}
 
 function parseVal( val) {
-
     // IT'S A NUMBER
     if (parseInt(val).toString() == val ) {
-        
         return val;
     }
-
     // CHECK IF PREV IS THE SAME
     console.log( "prev is: " + userInput[userInput.length-1])
     console.log( "this is: " + val )
@@ -102,9 +93,106 @@ function parseVal( val) {
     return "";
 }
 
-function addCharacter( val ) {
-    val = parseVal( val)
-    userInputAdd(val);
+function addKeyPress( val ) {
+
+    // NUMBER: GO
+    // SYMBOL: DEPENDS ON PREV
+    //      PERCENT: GO
+    //      FIRST ANYTHING: GO
+    //      FIRST SYMBOL WITH DECIMAL: GO
+    //      SECOND DECIMAL, WITH EXISTING SYMBOL: GO
+    //      SYMBOL WITH NO PREV VALUE: PULL LINE-B, GO
+
+
+     // IT'S A NUMBER
+     if (parseInt(val).toString() == val ) {
+        userInputAdd(val);
+    } else {
+        // IT'S A SYMOBL
+        let currentInput = userInput.split(/[0-9]/).filter(i => i);
+        switch(val) {
+            case "%":
+                if (userInput.length<1) {
+                    // PULL PREVIOUS NUMBER 
+                } else {
+                    let n = userInput[userInput.length-1];
+                    console.log(typeof n);
+                    if ( n== "%" | n=="." | parseInt(n).toString()==n ) {
+                        userInputAdd(val);
+                    }
+                };
+                break;
+            case ".":
+                if (userInput[userInput.length-1] != "%"){
+                    
+                    // let n = userInput.split(/[0-9%.]/).filter(i => i);
+                    let n = currentInput.filter(i=>i==".");
+                    
+                    if (n.length <1) {
+                        userInputAdd(val);
+                    } else if (n.length < 2 & currentInput.length > 1) {
+                        userInputAdd(val);
+                    }
+                }
+                break;
+                // break;
+            case "-":
+            case "+":
+            case "*":
+            case "/":
+                if (userInput.length<1) {
+                    // PULL PREVIOUS NUMBER 
+                } else {
+                    let n = userInput.split(/[0-9%.]/).filter(i => i);
+                    if ( ["-","+","*","/"].some( el => userInput[userInput.length-1].includes(el) ) ) {
+                        deleteCharacter();
+                        userInputAdd(val);
+                    } else if (n.length < 1) {
+                        userInputAdd(val);
+                    }
+                }
+
+                break;
+        }
+
+    }
+
+    // // CHECK IF PREV IS THE SAME
+    // console.log( "prev is: " + userInput[userInput.length-1])
+    // console.log( "this is: " + val )
+
+    // if (userInput[userInput.length-1] != val ) {
+
+    //     // CHECK PREV IS NOT A SYMBOL
+    //     if ( !isNaN( parseInt(userInput[userInput.length-1]))) {
+
+    //         return val;
+    //     } else {
+    //         deleteCharacter();
+    //         return val;
+
+    //     }
+    // }
+
+
+
+    // // val = parseVal( val);
+
+    // userInputAdd(val);
+}
+
+function userInputClear() {
+    userInput = "";
+    typeBox.textContent = userInput;
+}
+
+function userInputAdd( val) {
+    userInput += val;
+    typeBox.textContent = userInput;
+}
+function userInputDelete() {
+    userInput = userInput.slice(0, -1);
+    typeBox.textContent = userInput;
 }
 
 function deleteCharacter () {
@@ -141,8 +229,10 @@ function calcSolution() {
     typeBox.classList.add("yellow");
     inputA.classList.add("right");
     typeBox.textContent = "hello!";
-    let numbers = userInput.split(/[/*-+%]/).filter(i=>i)
-    let operations = userInput.split(/[0-9]/).filter(i => i);;
+    let numbers = userInput.split(/[/*-+%]/).filter(i=>i);
+    let operations = userInput.split(/[0-9]/).filter(i => i);
+
     console.log("the numbers are " + numbers);
     console.log("the operations are " + operations);
 }
+
