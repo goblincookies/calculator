@@ -333,7 +333,7 @@ function calcSolution() {
     lineA.classList.add("right");
     lineB.classList.add("shift");
 
-    let numbers = userInput.split(/[/*-+]/).filter(i=>i);
+    let numbers = userInput.split(/[^\d%.]/).filter(i=>i);
     let operations = userInput.split(/[0-9.%]/).filter(i => i);
     console.log("my recorded input is: ", userInput);
     console.log("the numbers are ", numbers);
