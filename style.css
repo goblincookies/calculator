@@ -118,6 +118,9 @@ body {
     -ms-transform: translateX(-2px);
     transform: translateX(-2px);
 }
+#del {
+    font-size: 15px;
+}
 button {
     border: none;
     display:inline-block;

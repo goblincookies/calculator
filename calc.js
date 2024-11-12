@@ -12,7 +12,9 @@ let displayingAnswer = false;
 let blinkSpeed = 400;
 let cursor = document.getElementById('cursor');
 
-keys.forEach( key => key.addEventListener("click", keyPress) );
+keys.forEach( key => key.addEventListener("click", keyClick) );
+
+document.addEventListener("keydown", keyPress);
 
 // BLINKING CURSOR
 setInterval(() => {
@@ -44,6 +46,50 @@ function playShiftAnim() {
 }
 
 function keyPress(e) {
+    console.log(e.key);
+    let val = e.key;
+
+    switch( val) {
+        case"Backspace":
+        case"Delete":
+            val = "del";
+            break;
+        case"Enter":
+        case"Return":
+            val = "calc";
+            break;
+        default:
+            val = val.split(/[^\d*+-/%.]/).filter(i=>i);
+            if (val.length > 0) {
+                val = val[0];
+            } else {
+                val = "";
+            }
+            // break;
+    }
+    
+    if (val.length > 0) {
+        filterDigit(val);
+    }
+
+
+    // if (val == "Backspace" | val =="Delete") {
+    //     val = "del";
+    //     filterDigit(val);
+    // } else {
+    //     val = val.split(/[^\d*+-/%.]/).filter(i=>i);
+    //     if (val.length > 0) {
+
+    //         filterDigit(val[0]);
+    //     }
+    // }
+}
+
+function keyClick(e) {
+    filterDigit(e.target.id);
+}
+
+function filterDigit( val ) {
 
     if (displayingAnswer) {
         shiftUp();
@@ -56,10 +102,11 @@ function keyPress(e) {
         lineA.classList.remove("right");
         userInputClear();
     }
-    console.log( e.target.id );
+
+    console.log( val );
     let isNumber = true;
 
-    switch( e.target.id) {
+    switch(val) {
         case "clear":
             clearScreen();
             isNumber = false;
@@ -76,7 +123,7 @@ function keyPress(e) {
 
     if (isNumber) {
         cursorVisibility(false);
-        addKeyPress( e.target.id);
+        addkeyClick( val);
     }
 
 };
@@ -111,7 +158,7 @@ function parseVal( val) {
     return "";
 }
 
-function addKeyPress( val ) {
+function addkeyClick( val ) {
 
     // NUMBER: GO
     // SYMBOL: DEPENDS ON PREV
@@ -297,7 +344,11 @@ function calcSolution() {
     // THERE ARE NO OPPERATIONS
     if (operations.length < 1 ) {
         console.log("no opperations i guess");
-        answer = processInput(userInput);
+        if (numbers.length < 1) {
+            answer = processInput("0");
+        } else {
+            answer = processInput(userInput);
+        }
     } else {
         if (numbers.length < 2) {
             numbers.push("0");
