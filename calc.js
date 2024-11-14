@@ -96,9 +96,11 @@ function processInput( val ) {
             displayOnScreen = false;
             break;
         case "calc":
-            primeDisplay();
-            calcSolution();
-            displayOnScreen = false;
+            if (userInput.length > 0) {
+                primeDisplay();
+                calcSolution();
+                displayOnScreen = false;
+            }
             break;
     };
 
@@ -254,7 +256,7 @@ function manageFloat( val ) {
 };
 
 function add (a,b) {
-    return manageFloat( manageFloat(cleanUpInput(a))+manageFloat(cleanUpInput(b)));
+    return manageFloat( manageFloat(cleanUpInput(a))+ manageFloat(cleanUpInput(b)));
 };
 // KEPT FOR LEGACY------------------------
 // ALL MINUS SYMBOLS ARE TREATED AS NEGATIVES
@@ -271,6 +273,7 @@ function divide(a,b) {
     return manageFloat(cleanUpInput(a)/cleanUpInput(b));
 };
 function cleanUpInput( digit ) {
+    digit = digit.toString();
     // GET PERCENTS
     let perc = digit.split(/[0-9.-]/).filter(i => i);
     if (perc.length > 0) {
@@ -300,6 +303,7 @@ function getNumbers( val ) {
                 if( el.length > 0 && ["-","+","*","/"].some( v => el[0].includes(v) ) ) break;
             };
             if (num.length < 2 && num[0]=="-") { num="";};
+            if (num.length < 2 && num[0]==".") { num="";};
             result.push(num);    
         }
         result.push(el);
@@ -329,9 +333,9 @@ function calcSolution() {
     // THERE ARE NO OPPERATIONS
     if (operations.length < 1 ) {
         if (numbers.length < 1) {
-            answer = processInput("0");
+            answer = cleanUpInput("0");
         } else if (numbers.length < 2) {
-            answer = processInput(userInput);
+            answer = cleanUpInput(userInput);
         } else {
             answer = add( numbers[0], numbers[1] );
         };
@@ -355,7 +359,7 @@ function calcSolution() {
                 break;
         };
     };
-
+    userInput = "";
     typeBox.textContent = manageFloat(answer);
     playShiftAnim();
 };
