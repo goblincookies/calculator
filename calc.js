@@ -166,11 +166,17 @@ function qualifiedDecimal(val) {
     if (lastDigit != "%" && lastDigit != "."){
         let decimalsSoFar = getSymbolsUsedSoFar(".");
         if (decimalsSoFar.length <1) {
+            console.log("dec1")
             return true;
         }
         let numbersSoFar = getNumbers(userInput);
-        if (decimalsSoFar.length < 2 && numbersSoFar.length >0 ) {
-            return true;
+        let opperatorsSoFar = getOpperations(userInput); 
+
+        if (decimalsSoFar.length < 2
+            && numbersSoFar.length > 0
+            && opperatorsSoFar.length > 0 ) {
+                console.log("dec2")
+                return true;
         };
     };
     return false;
