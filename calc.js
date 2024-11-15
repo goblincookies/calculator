@@ -4,14 +4,23 @@ let lineB = document.querySelector("#input-b");
 let typeBoxB = lineB.querySelector(".print-display");
 let printLines = document.querySelector("#print-out").querySelectorAll(".line");
 let userInput = "";
-
+let previousAnswer = "";
 let cursorVisible = true;
 let displayingAnswer = false;
+let ignoringPrevious = true;
 let blinkSpeed = 400;
 let cursor = document.getElementById('cursor');
-
+let maxChars = 12;
 // ADD EVENT LISTENERS TO ALL BUTTONS/KEYS && KEYBOARD
 document.querySelectorAll(".key").forEach( key => key.addEventListener("click", keyClick) );
+
+// PREVENTS KEYBOARD EVENTS FROM TRIGGERING THE BUTTONS CLICK HANDLER
+// PREVENTS ISSUE WHERE USERS WOULD CLICK 'CLEAR' THEN TYPE
+// AN EQUATION, AND ON 'ENTER' PRESS IT WOULD BOTH CALCULATE THE ANSWER
+// AND CLEAR THE SCREEN.
+document.querySelectorAll(".key").forEach( key => key.addEventListener("keydown", (event)=> {
+    event.preventDefault();
+} ) );
 document.addEventListener("keydown", keyPress);
 
 // BLINKING CURSOR
@@ -79,13 +88,17 @@ function primeDisplay(){
         typeBox.classList.add("green");
         displayingAnswer = false;
         lineA.classList.remove("right");
-        userInputClear();
+        if (ignoringPrevious) {
+            userInputClear();
+        };
+        ignoringPrevious = true;
     };
 };
 function processInput( val ) {
     let displayOnScreen = true;
     switch(val) {
         case "clear":
+            displayingAnswer = true;
             primeDisplay();
             clearScreen();
             displayOnScreen = false;
@@ -98,7 +111,7 @@ function processInput( val ) {
         case "calc":
             if (userInput.length > 0) {
                 primeDisplay();
-                calcSolution();
+                calcSolution( false );
                 displayOnScreen = false;
             }
             break;
@@ -111,9 +124,9 @@ function processInput( val ) {
     };
 
 };
-// function getOpperations( val ) {
-//     return val.split(/[0-9-.%]/).filter(i => i);
-// };
+function limitInput(val) {
+    return val.slice(0,maxChars);
+}
 function getOpperatorsSoFar() { return(userInput.split(/[0-9-.%]/).filter(i => i));}
 function getSymbolsUsedSoFar( val ) {return(userInput.split("").filter(i=>i==val) );}
 function isNumber(val) {
@@ -166,7 +179,13 @@ function qualifiedDecimal(val) {
 function qualifiedNegative(val) {
     // IS FIRST DIGIT
     if ( userInput.length < 1 ) {
-        return true;
+        if (isNumber(previousAnswer)) {
+            // calcSolution( true );
+            previousToScreen();
+            return true;
+        } else {
+            return true;
+        }
     };
 
     // LAST DIGIT IS A OPPERATOR
@@ -177,6 +196,12 @@ function qualifiedNegative(val) {
         return true;        
     }
     let numbersSoFar = getNumbers(userInput);
+    // CALC
+    if (numbersSoFar.length >1 ) {
+        calcSolution( true );
+        previousToScreen();
+        return true;
+    }
     let negativesSoFar = getSymbolsUsedSoFar("-");
     let opperatorsSoFar = getOpperatorsSoFar();
     let decimalsSoFar = getSymbolsUsedSoFar(".");
@@ -200,13 +225,22 @@ function qualifiedNegative(val) {
 };
 // VALIDATES ADDING AN OPPERATOR TO THE USER INPUT
 function qualifiedOpperator(val) {
+    let opperatorsSoFar = getOpperatorsSoFar();
+    if (opperatorsSoFar.length > 0 ) {
+        calcSolution( true );
+        previousToScreen();
+        return true;
+    }
+    if (userInput.length <1 && isNumber(previousAnswer)) {
+        previousToScreen();
+        return true;
+    };
     if (userInput.length > 0) {
         if ( ["+","*","/","-"].some( el => userInput.slice(-1).includes(el) )  && userInput.length > 1) {
             deleteCharacter();
             return(true);
         };
         let numbersSoFar = getNumbers(userInput);
-        let opperatorsSoFar = getOpperatorsSoFar();
         let negativesSoFar = getSymbolsUsedSoFar("-");
         if ( numbersSoFar.length ==1 && opperatorsSoFar.length < 1 && negativesSoFar.length < 2) {
             return(true);
@@ -237,16 +271,28 @@ function userInputClear() {
     userInput = "";
     typeBox.textContent = userInput;
 };
+function previousToScreen() {
+    ignoringPrevious = false;
+    userInput = "";
+    userInput = previousAnswer;
+    typeBox.textContent = userInput;
+}
 function userlineAdd( val) {
     userInput += val;
+    userInput = limitInput(userInput);
     typeBox.textContent = userInput;
 };
 function deleteCharacter() {
+    if (userInput.length < 1) {previousAnswer = "";}
     userInput = userInput.slice(0, -1);
     typeBox.textContent = userInput;
 };
 function clearScreen() {
-    userInputClear();
+    shiftUp();
+    userInput = "";
+    typeBox.textContent = userInput;
+    previousAnswer = "";
+    displayingAnswer = false;
     for (let i= 0; i < printLines.length-2; i++) {
         printLines[i].querySelector(".print-display").textContent = "";
     };
@@ -344,14 +390,9 @@ function getOpperations( val ) {
     return val.split(/[0-9-.%]/).filter(i => i);
 };
 
-function calcSolution() {
-    displayingAnswer = true;
-    cursorVisibility(false);
-    typeBoxB.textContent = userInput;
-    typeBox.classList.remove("green");
-    typeBox.classList.add("yellow");
-    lineA.classList.add("right");
-    lineB.classList.add("shift");
+function calcSolution( silently ) {
+
+    // typeBoxB.textContent = userInput;
 
     let numbers = getNumbers(userInput);
     let operations = getOpperations(userInput);
@@ -387,13 +428,24 @@ function calcSolution() {
                 break;
         };
     };
-    userInput = "";
     typeBox.textContent = manageFloat(answer);
+    previousAnswer = manageFloat(answer);
     playShiftAnim();
-};
 
-// ISSUES
-// -6% //-
-// -6. //-
-// -6+5 //+ >> -7 +
-// 8%-.-
+    if (silently) {
+        typeBoxB.textContent = userInput;
+        displayingAnswer = false;
+        shiftUp();
+        typeBoxB.textContent="";        
+    } else {
+        displayingAnswer = true;
+        cursorVisibility(false);
+        typeBoxB.textContent = userInput;
+        typeBox.classList.remove("green");
+        typeBox.classList.add("yellow");
+        lineA.classList.add("right");
+        lineB.classList.add("shift");
+    }
+
+    userInput = "";
+};
