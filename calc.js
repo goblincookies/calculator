@@ -111,8 +111,10 @@ function processInput( val ) {
     };
 
 };
-
-function getOpperatorsSoFar() { return(userInput.split(/[0-9%.-]/).filter(i => i));}
+// function getOpperations( val ) {
+//     return val.split(/[0-9-.%]/).filter(i => i);
+// };
+function getOpperatorsSoFar() { return(userInput.split(/[0-9-.%]/).filter(i => i));}
 function getSymbolsUsedSoFar( val ) {return(userInput.split("").filter(i=>i==val) );}
 function isNumber(val) {
     if(val.length > 1) {return false;}    
@@ -127,12 +129,15 @@ function qualifiedDigit(val) {
 };
 // VALIDATES ADDING A PERCENT TO THE USER INPUT
 function qualifiedPercent(val) {
+    
     if (userInput.length>0) {
         let lastDigit = userInput.slice(-1);
+        let numbersSoFar = getNumbers(userInput);
+        let opperatorsSoFar = getOpperations(userInput);
         if ( lastDigit == "%") {
             return true;
         };
-        if (lastDigit==".") {
+        if (lastDigit=="." && numbersSoFar.length >0 && opperatorsSoFar.length < 1) {
             return true;
         };
         if(isNumber(lastDigit) ) {
@@ -143,15 +148,15 @@ function qualifiedPercent(val) {
 };
 // VALIDATES ADDING A DECIMAL TO THE USER INPUT
 function qualifiedDecimal(val) {
-    if (userInput.length>0) { return true; };
-    if (userInput.slice(-1) != "%"){
+    if (userInput.length<1) { return true; };
+    let lastDigit = userInput.slice(-1);
+    if (lastDigit != "%" && lastDigit != "."){
         let decimalsSoFar = getSymbolsUsedSoFar(".");
-
         if (decimalsSoFar.length <1) {
             return true;
         }
-        let opperatorsSoFar = getOpperatorsSoFar();
-        if (decimalsSoFar.length < 2 & opperatorsSoFar.length > 0) {
+        let numbersSoFar = getNumbers(userInput);
+        if (decimalsSoFar.length < 2 && numbersSoFar.length >0 ) {
             return true;
         };
     };
@@ -163,15 +168,32 @@ function qualifiedNegative(val) {
     if ( userInput.length < 1 ) {
         return true;
     };
+
+    // LAST DIGIT IS A OPPERATOR
+    // REPLACE IT
     let lastDigit = userInput.slice(-1);
-    // LAST DIGIT IS SYMBOL
-    if (["+","*","/"].some( el => lastDigit.includes(el) ) ) {
-        return true;
-    };
+    if ( ["+","*","/"].some( el => lastDigit.includes(el)) ) {
+        deleteCharacter();
+        return true;        
+    }
+    let numbersSoFar = getNumbers(userInput);
     let negativesSoFar = getSymbolsUsedSoFar("-");
     let opperatorsSoFar = getOpperatorsSoFar();
+    let decimalsSoFar = getSymbolsUsedSoFar(".");
+    // LAST DIGIT IS SYMBOL
+    if ( userInput.length > 1
+        && ["%","."].some( el => lastDigit.includes(el) )
+        && numbersSoFar.length < 2
+        && negativesSoFar.length<2
+        && opperatorsSoFar.length < 1
+        && decimalsSoFar.length<2 ) {
+        return true;
+    };
     // LAST DIGIT IS A NUMBER, AND LESS THAN 2 NEGS, AND NO OPPERATORS 
-    if (isNumber(lastDigit)  && negativesSoFar.length<2 && opperatorsSoFar.length < 1) {
+    if (isNumber(lastDigit)
+        && negativesSoFar.length<2
+        && opperatorsSoFar.length < 1
+        && numbersSoFar.length < 2 ) {
         return true;
     };
     return false;
@@ -302,8 +324,14 @@ function getNumbers( val ) {
                 el= el.slice(1);
                 if( el.length > 0 && ["-","+","*","/"].some( v => el[0].includes(v) ) ) break;
             };
-            if (num.length < 2 && num[0]=="-") { num="";};
-            if (num.length < 2 && num[0]==".") { num="";};
+            let invalidNumber = true;
+            num.inArra
+            num.split("").forEach( i => {
+                if (isNumber(i)) { invalidNumber = false;}
+            });
+            if (invalidNumber) { num = ""; };
+            // if (num.length < 2 && num[0]=="-") { num="";};
+            // if (num.length < 2 && num[0]==".") { num="";};
             result.push(num);    
         }
         result.push(el);
@@ -363,3 +391,9 @@ function calcSolution() {
     typeBox.textContent = manageFloat(answer);
     playShiftAnim();
 };
+
+// ISSUES
+// -6% //-
+// -6. //-
+// -6+5 //+ >> -7 +
+// 8%-.-
