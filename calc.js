@@ -197,10 +197,10 @@ function qualifiedNegative(val) {
     // LAST DIGIT IS A OPPERATOR
     // REPLACE IT
     let lastDigit = userInput.slice(-1);
-    if ( ["+","*","/"].some( el => lastDigit.includes(el)) ) {
-        deleteCharacter();
-        return true;        
-    }
+    // if ( ["+","*","/"].some( el => lastDigit.includes(el)) ) {
+    //     deleteCharacter();
+    //     return true;        
+    // }
     let numbersSoFar = getNumbers(userInput);
     // CALC
     if (numbersSoFar.length >1 ) {
@@ -213,10 +213,10 @@ function qualifiedNegative(val) {
     let decimalsSoFar = getSymbolsUsedSoFar(".");
     // LAST DIGIT IS SYMBOL
     if ( userInput.length > 1
-        && ["%","."].some( el => lastDigit.includes(el) )
+        && ["+","*","/","%","."].some( el => lastDigit.includes(el) )
         && numbersSoFar.length < 2
         && negativesSoFar.length<2
-        && opperatorsSoFar.length < 1
+        && opperatorsSoFar.length < 2
         && decimalsSoFar.length<2 ) {
         return true;
     };
